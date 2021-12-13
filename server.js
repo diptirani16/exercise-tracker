@@ -55,6 +55,35 @@ app.get('/api/users', (req, res) => {
     })
 })
 
+app.post('/api/users/:_id/exercises', (req, res) => {
+    const userId = req.params._id;
+    let dateInput;
+    req.body.date ? dateInput = req.body.date : dateInput = new Date();
+    console.log(req.body);
+
+    userModel.findById(userId, (err, user) => {
+        if(!user) {
+            res.json({ error: 'invalid user id' });
+        }
+        else {
+            user.exercises.push({
+                description: req.body.description,
+                duration: +req.body.duration,
+                date: new Date(dateInput).toDateString()
+            })
+            user.save(user.exercises)
+                
+            res.json({
+                _id: userId,
+                username: user.username,
+                date: new Date(dateInput).toDateString(),
+                duration: +req.body.duration,
+                description: req.body.description
+            })
+        }
+    })
+})
+
 const listener = app.listen(process.env.PORT || 3000, () => {
     console.log('Your app is listening on port ' + listener.address().port)
 })
