@@ -59,7 +59,6 @@ app.post('/api/users/:_id/exercises', (req, res) => {
     const userId = req.params._id;
     let dateInput;
     req.body.date ? dateInput = req.body.date : dateInput = new Date();
-    console.log(req.body);
 
     userModel.findById(userId, (err, user) => {
         if(!user) {
@@ -80,6 +79,34 @@ app.post('/api/users/:_id/exercises', (req, res) => {
                 duration: +req.body.duration,
                 description: req.body.description
             })
+        }
+    })
+})
+
+app.get('/api/users/:_id/logs', (req, res) => {
+    const userId = req.params._id;
+    userModel.findById(userId, (err, user) => {
+        console.log(user.exercises);
+        let newExerciseList = [];
+        user.exercises.map(i => {
+            newExerciseList = [{
+                description: i.description,
+                duration: i.duration,
+                date: new Date(i.date).toDateString(),
+                _id: userId
+            }]
+        })
+        console.log(newExerciseList);
+
+        if(!err) {
+            res.json({ 
+                username: user.username,
+                count: user.exercises.length,
+                _id: userId,
+                log: newExerciseList
+             });
+        } else {
+            return;
         }
     })
 })
